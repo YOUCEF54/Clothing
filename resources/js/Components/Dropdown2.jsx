@@ -33,7 +33,7 @@ function ProfileMenu({toggleDarkMode }) {
 const [profileMenuItems, setProfileMenuItems] = useState([]);
 
   useEffect(() => {
-    (auth.user !== null) ?
+    (auth.user === null) ?
       setProfileMenuItems( [
         {
           label: "Login",
