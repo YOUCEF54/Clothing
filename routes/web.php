@@ -14,6 +14,36 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 
 
+Route::post('/dashboard', function (Request $request) {
+    // Initialize an array to store the file paths
+    $filePaths = [];
+
+    // Validate the request data
+    $request->validate([
+        'avatars' => 'required|array', // Ensure 'avatars' is an array
+        'avatars.*' => 'required|file|image|max:1024', // Validate each file in the array
+    ]);
+
+    foreach ($request->file('avatars') as $index => $avatar) {
+        // Check if the file name contains "_"
+        if (strpos($avatar->getClientOriginalName(), '_') !== false) {
+            // Handle edited image (uploaded as a new file)
+            // Store the edited image
+            $filename = uniqid() . '_' . $index . '.' . $avatar->getClientOriginalExtension();
+            $path = $avatar->storeAs('public', $filename);
+            $filePaths[] = $path;
+        } else {
+            // Handle regular file upload
+            // Store the uploaded avatars
+            $filename = uniqid() . '_' . $index . '.' . $avatar->getClientOriginalExtension();
+            $path = $avatar->storeAs('public', $filename);
+            $filePaths[] = $path;
+        }
+    }
+
+    return Inertia::render('/dashboard');
+});
+
 
 Route::get('/', function () {
     return Inertia::render('HomePage', [
